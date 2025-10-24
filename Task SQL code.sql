@@ -19,7 +19,7 @@ CREATE TABLE salary_history (
         ON UPDATE CASCADE
 );
 
---  Generate 1000 random rows
+--  Generate 1000 random rows for employee table
 INSERT INTO employees (first_name, last_name, department, salary, start_date)
 SELECT
     CONCAT(UCASE(LEFT(SUBSTRING(MD5(RAND()), 1, 6), 1)), LOWER(SUBSTRING(MD5(RAND()), 2, 5))) AS first_name,
@@ -45,7 +45,7 @@ CROSS JOIN
 SELECT * FROM employees LIMIT 10;
 
 
--- proc to Insert into salary_history 
+-- proc to Insert into salary_history table
 DELIMITER $$
 
 CREATE PROCEDURE generate_salary_history()
@@ -145,5 +145,6 @@ GROUP BY department, YEAR(start_date)
 ORDER BY department, year;
 
 select * from avg_salary_time_series;
+
 
 
