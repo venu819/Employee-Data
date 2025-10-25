@@ -8,6 +8,7 @@ CREATE TABLE employees (
     start_date DATE
 );
 
+-- Create the salary_history table
 CREATE TABLE salary_history (
     history_id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT NOT NULL,
@@ -150,6 +151,7 @@ GROUP BY department, YEAR(start_date)
 ORDER BY department, year;
 
 select * from avg_salary_time_series;
+
 
 
 
