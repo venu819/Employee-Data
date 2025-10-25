@@ -83,24 +83,32 @@ DELIMITER ;
 -- Run it
 CALL generate_salary_history();
 
-##Question 1 : Show employees with second highest salary in each department, make it dynamic, that it can take parameters, where user can change second highest to any other number.
+-- Question 1 : Show employees with second highest salary in each department, make it dynamic, that it can take parameters, where user can change second highest to any other number.
 
+SET @N := 2;  -- Change this to get N-th highest salary per department
 
-SET @N := 2;  -- change this value
-
-SELECT e1.department, e1.employee_id, e1.first_name, e1.last_name, e1.salary
-FROM employees e1
-WHERE (
-    SELECT COUNT(DISTINCT e2.salary)
-    FROM employees e2
-    WHERE e2.department = e1.department
-      AND e2.salary > e1.salary
-) = @N - 1
-ORDER BY e1.department, e1.salary DESC;
+WITH rank_employees AS (
+    SELECT 
+        employee_id,
+        first_name,
+        last_name,
+        department,
+        salary,
+        DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS salary_rank
+    FROM employees
+)
+SELECT 
+    department,
+    employee_id,
+    first_name,
+    last_name,
+    salary
+FROM rank_employees
+WHERE salary_rank = @N
+ORDER BY department, salary DESC;
 
 
 -- Question 2: Show employees with highest change between their starting salary and current salary for each department.
-
 
 WITH salary_change AS (
     SELECT 
@@ -130,10 +138,7 @@ WHERE sc.rnk = 1
 ORDER BY sc.department;
 
 
-
-
 -- Question 3: Create a time series view of the data, showing average salary per department, group by year/month.
-
 
 CREATE OR REPLACE VIEW avg_salary_time_series AS
 SELECT 
@@ -145,6 +150,7 @@ GROUP BY department, YEAR(start_date)
 ORDER BY department, year;
 
 select * from avg_salary_time_series;
+
 
 
 
